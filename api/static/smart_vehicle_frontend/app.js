@@ -1,10 +1,11 @@
 (() => {
   "use strict";
 
+  const websocketProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const DEFAULT_CONFIG = {
-    mockMode: true,
-    apiBase: "http://127.0.0.1:5000/api",
-    websocketUrl: "ws://127.0.0.1:5000/ws/video",
+    mockMode: false,
+    apiBase: `${window.location.origin}/api`,
+    websocketUrl: `${websocketProtocol}//${window.location.host}/ws/video`,
     frameRequestIntervalMs: 100,
     websocketRequestsFrames: true,
     reconnectDelayMs: 2000,
@@ -217,7 +218,7 @@
 
     try {
       const loaded = CONFIG.mockMode
-        ? await loadImageElement(map.imageUrl || "./assets/demo-map.png")
+        ? await loadImageElement(map.imageUrl || "/static/smart_vehicle_frontend/assets/demo-map.png")
         : await requestMapSource(map);
 
       const meta = {

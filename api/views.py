@@ -1,52 +1,50 @@
-
-#运行命令  python manage.py runserver
-#运行命令（非127.0.0.1地址） python manage.py runserver 0.0.0.0:8000
-
-from django.http import HttpResponse, JsonResponse, FileResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
-import os
 import json
+from pathlib import Path
 
-# 模拟本地地图存放路径，你改成自己PGM地图文件夹
-MAP_FOLDER = "C:/Users/zmt/Desktop/car/api/templates/map"
-@csrf_exempt
+from django.conf import settings
+from django.http import FileResponse, HttpResponse, JsonResponse
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+
+
 # 返回前端页面
+@csrf_exempt
 def index_view(request):
     return render(request, "smart_vehicle_frontend/index.html")
 
 # GET /api/maps 返回地图列表
 def api_map_list(request):
-    print("start\n")
-    if not os.path.exists(MAP_FOLDER):
-        os.makedirs(MAP_FOLDER)
-        return JsonResponse({"maps":[]})
-    map_names = []
-    print("路径存在")
-    for f in os.listdir(MAP_FOLDER):
-        if f.endswith(".pgm") or f.endswith(".png"):
-            name,_ = os.path.splitext(f)
-            map_names.append(name)
+    map_folder = Path(settings.MAP_FOLDER)
+    map_folder.mkdir(parents=True, exist_ok=True)
+    map_names = sorted({
+        file_path.stem
+        for file_path in map_folder.iterdir()
+        if file_path.is_file() and file_path.suffix in {".pgm", ".png"}
+    })
     return JsonResponse({"maps": map_names})
 
 
 def api_map_image(request, map_name):
     """GET /api/maps/{map_name}/image"""
+    if map_name in {".", ".."} or "/" in map_name or "\\" in map_name:
+        return HttpResponse("invalid map name", status=400)
+
     # 查找pgm或者png地图文件
-    pgm_path = os.path.join(MAP_FOLDER, f"{map_name}.pgm")
-    png_path = os.path.join(MAP_FOLDER, f"{map_name}.png")
+    map_folder = Path(settings.MAP_FOLDER)
+    pgm_path = map_folder / f"{map_name}.pgm"
+    png_path = map_folder / f"{map_name}.png"
     file_path = None
     content_type = None
-    if os.path.exists(pgm_path):
+    if pgm_path.is_file():
         file_path = pgm_path
         content_type = "image/x-portable-graymap"
-    elif os.path.exists(png_path):
+    elif png_path.is_file():
         file_path = png_path
         content_type = "image/png"
     if not file_path:
         return HttpResponse("map not found", status=404)
 
-    resp = FileResponse(open(file_path, "rb"), content_type=content_type)
+    resp = FileResponse(file_path.open("rb"), content_type=content_type)
     # 设置前端需要读取的自定义头！非常关键！
     resp["X-Map-Resolution"] = "0.05"
     resp["X-Map-Origin-X"] = "0.0"
