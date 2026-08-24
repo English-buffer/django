@@ -1,11 +1,13 @@
 /**
  * 后端连接配置。
- * 开发预览时保持 mockMode: true；接入真实后端时改为 false。
+ * 默认连接当前页面同源的 Django HTTP 与 WebSocket 服务。
  */
+const websocketProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+
 window.APP_CONFIG = {
   mockMode: false,
-  apiBase: "http://127.0.0.1:8000/api",
-  websocketUrl: "ws://127.0.0.1:8000/ws/video",
+  apiBase: `${window.location.origin}/api`,
+  websocketUrl: `${websocketProtocol}//${window.location.host}/ws/video`,
   frameRequestIntervalMs: 100,
   websocketRequestsFrames: true,
   reconnectDelayMs: 2000,

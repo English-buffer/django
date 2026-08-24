@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
   <title>智能车上位机系统</title>
-  <link rel="stylesheet" href="{% static 'styles.css' %}" />
+  <link rel="stylesheet" href="{% static 'smart_vehicle_frontend/styles.css' %}" />
 </head>
 <body>
   <div class="app-shell">
@@ -106,7 +106,7 @@
           <div class="live-indicator"><span></span><b>LIVE</b></div>
         </div>
         <div class="video-frame-shell">
-          <img id="videoFrame" src="./assets/demo-camera.jpg" alt="摄像头实时画面" />
+          <img id="videoFrame" src="{% static 'smart_vehicle_frontend/assets/demo-camera.jpg' %}" alt="摄像头实时画面" />
           <div class="video-scanline" aria-hidden="true"></div>
           <div class="video-corner corner-tl" aria-hidden="true"></div>
           <div class="video-corner corner-tr" aria-hidden="true"></div>
@@ -142,7 +142,7 @@
     </main>
   </div>
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
-  <script src="{% static 'config.js' %}"></script>
-  <script src="{% static 'app.js' %}"></script>
+  <script src="{% static 'smart_vehicle_frontend/config.js' %}"></script>
+  <script src="{% static 'smart_vehicle_frontend/app.js' %}"></script>
 </body>
 </html>
